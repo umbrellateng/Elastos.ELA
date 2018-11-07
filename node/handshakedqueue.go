@@ -1,6 +1,7 @@
 package node
 
 import (
+	"github.com/elastos/Elastos.ELA/log"
 	"net"
 	"sync"
 	"time"
@@ -52,6 +53,7 @@ func (q *handshakeQueue) handleTimeout(addr string, node protocol.Noder) {
 	if conn, ok := q.conns[node]; ok {
 		conn.Close()
 		delete(q.conns, node)
+		log.Info("handshake queue: remove from connecting list")
 		LocalNode.RemoveFromConnectingList(addr)
 		<-q.capChan
 	}

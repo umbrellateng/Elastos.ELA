@@ -92,6 +92,7 @@ func (cn *ConnectingNodes) init() {
 }
 
 func (cn *ConnectingNodes) add(addr string) bool {
+	log.Info("add to connecting list")
 	cn.Lock()
 	defer cn.Unlock()
 	_, ok := cn.List[addr]
@@ -102,6 +103,7 @@ func (cn *ConnectingNodes) add(addr string) bool {
 }
 
 func (cn *ConnectingNodes) del(addr string) {
+	log.Info("delete connecting list")
 	cn.Lock()
 	defer cn.Unlock()
 	delete(cn.List, addr)
