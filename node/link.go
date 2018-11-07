@@ -192,7 +192,7 @@ func (node *node) Connect(addr string) error {
 	n := NewNode(conn, false)
 	n.SetState(HAND)
 	n.SendMessage(NewVersion(node))
-
+	log.Info("add to handshake queue:", tcpAddr)
 	node.AddToHandshakeQueue(tcpAddr, n)
 	return nil
 }

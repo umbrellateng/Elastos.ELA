@@ -28,12 +28,13 @@ func (q *handshakeQueue) init() {
 }
 
 func (q *handshakeQueue) AddToHandshakeQueue(addr string, node protocol.Noder) {
+	log.Info("add to handshake queue 1")
 	q.capChan <- node
-
+	log.Info("add to handshake queue 2")
 	q.Lock()
 	q.conns[node] = node.GetConn()
 	q.Unlock()
-
+	log.Info("add to handshake queue 3")
 	// Close handshake timeout connections
 	go q.handleTimeout(addr, node)
 }
@@ -50,8 +51,10 @@ func (q *handshakeQueue) RemoveFromHandshakeQueue(node protocol.Noder) {
 func (q *handshakeQueue) handleTimeout(addr string, node protocol.Noder) {
 	time.Sleep(time.Second * protocol.HandshakeTimeout)
 	q.Lock()
+	log.Info("handle timeout 1")
 	if conn, ok := q.conns[node]; ok {
 		conn.Close()
+		log.Info("handle timeout 2")
 		delete(q.conns, node)
 		log.Info("handshake queue: remove from connecting list, address:", addr)
 		LocalNode.RemoveFromConnectingList(addr)
