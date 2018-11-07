@@ -160,8 +160,17 @@ func (node *node) RequireNeighbourList() {
 }
 
 func (node *node) ConnectNodes() {
-	log.Debug()
 	internal, total := node.GetConnectionCount()
+	log.Info("internal count:", internal, "total count:", total)
+	if len(node.ConnectingNodes.List) == 0 {
+		log.Info("node.ConnectingNodes.List is empty")
+	} else {
+		log.Info("length of node.ConnectingNodes.List:", len(node.ConnectingNodes.List))
+	}
+	for key := range node.ConnectingNodes.List {
+		log.Info("connecting list unit:", key)
+
+	}
 	if internal < MinConnectionCount {
 		for _, seed := range config.Parameters.SeedList {
 			node.Connect(seed)
@@ -174,11 +183,11 @@ func (node *node) ConnectNodes() {
 		}
 	}
 
-	if node.NeedMoreAddresses() {
-		for _, nbr := range node.GetNeighborNodes() {
-			nbr.RequireNeighbourList()
-		}
-	}
+	//if node.NeedMoreAddresses() {
+	//	for _, nbr := range node.GetNeighborNodes() {
+	//		nbr.RequireNeighbourList()
+	//	}
+	//}
 
 	if total > DefaultMaxPeers {
 		DisconnectNode(node.GetExternalNeighbourRandomly().ID())
