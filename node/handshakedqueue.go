@@ -49,10 +49,12 @@ func (q *handshakeQueue) RemoveFromHandshakeQueue(node protocol.Noder) {
 }
 
 func (q *handshakeQueue) handleTimeout(addr string, node protocol.Noder) {
+	log.Info("handle timeout 0", addr)
 	time.Sleep(time.Second * protocol.HandshakeTimeout)
 	q.Lock()
-	log.Info("handle timeout 1")
+	log.Info("handle timeout 1", addr)
 	if conn, ok := q.conns[node]; ok {
+		log.Info("handle timeout 1.5")
 		conn.Close()
 		log.Info("handle timeout 2")
 		delete(q.conns, node)

@@ -83,6 +83,8 @@ func (h *HandlerBase) HandleMessage(message p2p.Message) {
 
 func (h *HandlerBase) onVersion(version *msg.Version) {
 	node := h.node
+	log.Info("on version addr:", node.Addr())
+	log.Info("on version state:", protocol.States[node.State()])
 	// Exclude the node itself
 	if version.Nonce == LocalNode.ID() {
 		log.Warn("The node handshake with itself")
@@ -134,6 +136,8 @@ func (h *HandlerBase) onVersion(version *msg.Version) {
 
 func (h *HandlerBase) onVerAck(verAck *msg.VerAck) {
 	node := h.node
+	log.Info("on verack addr:", node.Addr())
+	log.Info("on verack state:", protocol.States[node.State()])
 	if node.State() != protocol.HANDSHAKE && node.State() != protocol.HANDSHAKED {
 		log.Warn("unknown status to received verack")
 		node.Disconnect()
