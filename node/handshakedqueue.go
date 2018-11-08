@@ -57,6 +57,7 @@ func (q *handshakeQueue) handleTimeout(addr string, node protocol.Noder) {
 	q.Lock()
 	log.Info("handle timeout 1", addr)
 	log.Infof("node: %p", node)
+	log.Info("length of q.conns:", len(q.conns))
 	for _, v := range q.conns {
 		log.Info("q.conn:", v)
 	}
