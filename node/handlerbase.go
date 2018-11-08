@@ -152,8 +152,8 @@ func (h *HandlerBase) onVerAck(verAck *msg.VerAck) {
 
 	// Finish handshake
 	LocalNode.RemoveFromHandshakeQueue(node)
-	LocalNode.RemoveFromConnectingList(node.NetAddress().String())
-	log.Info("handler base: remove from connecting list, net address:", node.NetAddress().String())
+	LocalNode.RemoveFromConnectingList(node.Addr())
+	log.Info("handler base: remove from connecting list, net address:", node.Addr())
 
 	// Add node to neighbor list
 	LocalNode.AddNeighborNode(node)
