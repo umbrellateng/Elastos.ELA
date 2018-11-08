@@ -24,7 +24,7 @@ type handshakeQueue struct {
 
 func (q *handshakeQueue) init() {
 	q.capChan = make(chan protocol.Noder, protocol.DefaultMaxPeers)
-	q.conns = make(map[protocol.Noder]net.Conn, protocol.DefaultMaxPeers)
+	q.conns = make(map[protocol.Noder]net.Conn)
 }
 
 func (q *handshakeQueue) AddToHandshakeQueue(addr string, node protocol.Noder) {
@@ -45,6 +45,7 @@ func (q *handshakeQueue) AddToHandshakeQueue(addr string, node protocol.Noder) {
 func (q *handshakeQueue) RemoveFromHandshakeQueue(node protocol.Noder) {
 	q.Lock()
 	if _, ok := q.conns[node]; ok {
+		log.Info("remove from handshake queue:", node.Addr())
 		delete(q.conns, node)
 		<-q.capChan
 	}
