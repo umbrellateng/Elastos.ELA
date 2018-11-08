@@ -39,13 +39,13 @@ type link struct {
 	quit      chan struct{}
 }
 
-func (node *node) String() string {
-	direction := "outbound"
-	if node.inbound {
-		direction = "inbound"
-	}
-	return fmt.Sprintf("%s (%s)", node.addr, direction)
-}
+//func (node *node) String() string {
+//	direction := "outbound"
+//	if node.inbound {
+//		direction = "inbound"
+//	}
+//	return fmt.Sprintf("%s (%s)", node.addr, direction)
+//}
 
 func (node *node) UpdateHandler(handler Handler) {
 	node.handler = handler
