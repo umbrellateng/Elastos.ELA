@@ -34,7 +34,9 @@ func (q *handshakeQueue) AddToHandshakeQueue(addr string, node protocol.Noder) {
 	q.Lock()
 	q.conns[node] = node.GetConn()
 	q.Unlock()
-	log.Infof("addr:", addr, "node: %p", node, "conn:", q.conns[node])
+	log.Info("addr:", addr)
+	log.Infof("node %p", node)
+	log.Infof("conn %p", q.conns[node])
 	log.Info("add to handshake queue 3")
 	// Close handshake timeout connections
 	go q.handleTimeout(addr, node)
@@ -54,7 +56,7 @@ func (q *handshakeQueue) handleTimeout(addr string, node protocol.Noder) {
 	time.Sleep(time.Second * protocol.HandshakeTimeout)
 	q.Lock()
 	log.Info("handle timeout 1", addr)
-	log.Infof("addr:", addr, "node: %p", node)
+	log.Infof("node: %p", node)
 	for _, v := range q.conns {
 		log.Info("q.conn:", v)
 	}
