@@ -2,6 +2,7 @@ package mempool
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/elastos/Elastos.ELA/blockchain"
@@ -28,8 +29,8 @@ func (pool *BlockPool) Init() {
 }
 
 func (pool *BlockPool) AppendBlock(blockConfirm *core.BlockConfirm) (bool, error) {
-	log.Info("[AppendBlock] start")
-	defer log.Info("[AppendBlock] end")
+	//log.Info("[AppendBlock] start")
+	//defer log.Info("[AppendBlock] end\n")
 
 	// add block
 	block := blockConfirm.Block
@@ -55,7 +56,7 @@ func (pool *BlockPool) AppendBlock(blockConfirm *core.BlockConfirm) (bool, error
 	// confirm block
 	isConfirmed := true
 	if err := pool.ConfirmBlock(hash); err != nil {
-		log.Debug("[AppendBlock] ConfirmBlock failed, hash:", hash.String())
+		log.Debug("[AppendBlock] ConfirmBlock failed, hash:", hash.String(),"err: ",err)
 		isConfirmed = false
 	}
 
@@ -91,21 +92,27 @@ func (pool *BlockPool) AppendConfirm(confirm *core.DPosProposalVoteSlot) error {
 }
 
 func (pool *BlockPool) ConfirmBlock(hash common.Uint256) error {
-	log.Info("[ConfirmBlock] start")
-	defer log.Info("[ConfirmBlock] end")
+	fmt.Printf("\n\n")
+	log.Warn("[ConfirmBlock] start")
+	defer log.Warn("[ConfirmBlock] end\n\n")
+	log.Info("hash:", hash)
 	block, exist := pool.GetBlock(hash)
 	if !exist {
+		log.Warn("there is no block in pool when confirming block")
 		return errors.New("there is no block in pool when confirming block")
 	}
 
 	confirm, exist := pool.confirmMap[hash]
 	if !exist {
+		log.Warn("there is no block confirmation in pool when confirming block")
 		return errors.New("there is no block confirmation in pool when confirming block")
 	}
 	if err := blockchain.CheckBlockWithConfirmation(block, confirm); err != nil {
+		log.Warn("block confirmation validate failed")
 		return errors.New("block confirmation validate failed")
 	}
 
+	log.Info("[ConfirmBlock] block height:", block.Height)
 	inMainChain, isOrphan, err := blockchain.DefaultLedger.Blockchain.AddBlock(block)
 	if err != nil {
 		return errors.New("add block failed")

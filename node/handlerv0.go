@@ -163,14 +163,14 @@ func (h *HandlerV0) onGetData(req *v0.GetData) error {
 
 	block, err := chain.DefaultLedger.Store.GetBlock(hash)
 	if err != nil {
-		log.Debugf("Can't get block from hash %s, send not found message", hash)
+		log.Error("Can't get block from hash %s, send not found message", hash)
 		node.SendMessage(v0.NewNotFound(hash))
 		return err
 	}
 
 	confirm, ok := LocalNode.GetConfirm(hash)
 	if !ok {
-		log.Debugf("Can't get confirm from hash %s", hash)
+		log.Error("******************* Can't get confirm from hash %s", hash)
 		node.SendMessage(msg.NewBlock(&core.BlockConfirm{
 			BlockFlag: true,
 			Block:     block,
@@ -178,6 +178,7 @@ func (h *HandlerV0) onGetData(req *v0.GetData) error {
 		return nil
 	}
 
+	log.Error("******************* get confirm from hash %s", hash)
 	node.SendMessage(msg.NewBlock(&core.BlockConfirm{
 		BlockFlag:   true,
 		Block:       block,
@@ -191,16 +192,16 @@ func (h *HandlerV0) onGetData(req *v0.GetData) error {
 func (h *HandlerV0) onBlock(msgBlock *core.BlockConfirm) error {
 	node := h.base.node
 	hash := msgBlock.Block.Hash()
-	log.Debug("[onblock] handlerV0 received block:", hash.String())
+	//log.Info("[onblock] handlerV0 received block:", hash.String())
 
 	if !LocalNode.IsNeighborNode(node.ID()) {
-		log.Debug("Received block message from unknown peer")
+		log.Info("Received block message from unknown peer")
 		return fmt.Errorf("received block message from unknown peer")
 	}
 
 	if chain.DefaultLedger.BlockInLedger(hash) {
 		h.duplicateBlocks++
-		log.Debug("Receive ", h.duplicateBlocks, " duplicated block.")
+		log.Info("Receive ", h.duplicateBlocks, " duplicated block.")
 		return fmt.Errorf("received duplicated block")
 	}
 
@@ -211,7 +212,7 @@ func (h *HandlerV0) onBlock(msgBlock *core.BlockConfirm) error {
 
 	ok, err := LocalNode.AppendBlock(msgBlock)
 	if err != nil {
-		log.Debugf("Received invalid block %s", hash.String())
+		//log.Debugf("Received invalid block %s", hash.String())
 		return fmt.Errorf("Receive invalid block %s, err: %s", hash.String(), err.Error())
 	}
 	if !ok {
@@ -241,6 +242,7 @@ func (h *HandlerV0) onBlock(msgBlock *core.BlockConfirm) error {
 }
 
 func (h *HandlerV0) onConfirm(confirm *core.DPosProposalVoteSlot) error {
+	log.Info("[onConfirm] received from ela p2p")
 	err := LocalNode.AppendConfirm(confirm)
 	if err != nil {
 		return fmt.Errorf("receive invalid confirm %s, err: %s", confirm.Hash, err.Error())

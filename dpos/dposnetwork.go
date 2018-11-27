@@ -2,6 +2,7 @@ package dpos
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 
 	"github.com/elastos/Elastos.ELA/config"
@@ -193,6 +194,8 @@ func (n *dposNetwork) processMessage(msgItem *messageItem) {
 	case msg.AcceptVote:
 		msgVote, processed := m.(*msg.VoteMessage)
 		if processed {
+			fmt.Printf("\n")
+			log.Error("[OnVoteReceived] vote msg hash:", msg.GetMessageHash(msgVote).String())
 			n.listener.OnVoteReceived(msgItem.ID, msgVote.Vote)
 		}
 	case msg.RejectVote:

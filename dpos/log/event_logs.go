@@ -13,7 +13,7 @@ func (e *EventLogs) OnProposalFinished(prop ProposalEvent) {
 		"BlockHash:", prop.BlockHash, "EndTime:", prop.EndTime, "Result:", prop.Result)
 }
 
-func (e *EventLogs) OnVoteArrived(vote VoteEvent) {
+func (e *EventLogs)  OnVoteArrived(vote VoteEvent) {
 	Info("[OnVoteArrived], Signer:", vote.Signer, "ReceivedTime:", vote.ReceivedTime, "Result:", vote.Result)
 }
 
@@ -27,5 +27,6 @@ func (e *EventLogs) OnConsensusStarted(cons ConsensusEvent) {
 }
 
 func (e *EventLogs) OnConsensusFinished(cons ConsensusEvent) {
-	Info("[OnConsensusFinished], EndTime:", cons.EndTime, "Height:", cons.EndTime)
+	Info("[OnConsensusFinished], EndTime:", cons.EndTime,"Height:", cons.EndTime)
+
 }

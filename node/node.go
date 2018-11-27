@@ -332,7 +332,7 @@ func (node *node) BloomFilter() *bloom.Filter {
 }
 
 func (node *node) Relay(from protocol.Noder, message interface{}) error {
-	log.Debug()
+	//log.Debug()
 	if from != nil && LocalNode.IsSyncHeaders() {
 		return nil
 	}
@@ -356,7 +356,7 @@ func (node *node) Relay(from protocol.Noder, message interface{}) error {
 					node.txnCnt++
 				}
 			case *BlockConfirm:
-				log.Debug("Relay block message")
+				//log.Debug("Relay block message")
 				if nbr.BloomFilter().IsLoaded() && message.BlockFlag {
 					inv := msg.NewInventory()
 					blockHash := message.Block.Hash()

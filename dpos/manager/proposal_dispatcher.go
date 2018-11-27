@@ -3,6 +3,7 @@ package manager
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/elastos/Elastos.ELA/blockchain"
@@ -73,6 +74,8 @@ func (p *proposalDispatcher) GetProcessingBlock() *core.Block {
 }
 
 func (p *proposalDispatcher) ProcessVote(v core.DPosProposalVote, accept bool) {
+	log.Info("[ProcessVote] start")
+	defer log.Info("[ProcessVote] end")
 	if accept {
 		p.countAcceptedVote(v)
 	} else {
@@ -85,6 +88,8 @@ func (p *proposalDispatcher) IsVoteSlotEmpty() bool {
 }
 
 func (p *proposalDispatcher) StartProposal(b *core.Block) {
+	log.Info("[StartProposal] start")
+	defer log.Info("[StartProposal] end")
 	if p.processingBlock != nil {
 		log.Info("[StartProposal] start proposal failed")
 		return
@@ -102,7 +107,7 @@ func (p *proposalDispatcher) StartProposal(b *core.Block) {
 		return
 	}
 
-	log.Debug("[StartProposal] sponsor:", p.manager.GetPublicKey())
+	log.Error("[StartProposal] sponsor:", p.manager.GetPublicKey())
 
 	m := &msg2.ProposalMessage{
 		Proposal: proposal,
@@ -126,15 +131,22 @@ func (p *proposalDispatcher) StartProposal(b *core.Block) {
 }
 
 func (p *proposalDispatcher) TryStartSpeculatingProposal(b *core.Block) {
+	log.Info("[TryStartSpeculatingProposal] start")
+	defer log.Info("[TryStartSpeculatingProposal] end")
 
 	if p.processingBlock != nil {
+		log.Info("[TryStartSpeculatingProposal] proposalDispatcher.processingBlock is not nil, return")
 		return
 	}
+	log.Info("[TryStartSpeculatingProposal] proposalDispatcher.processingBlock is nil")
 	p.processingBlock = b
 	p.currentVoteSlot = &core.DPosProposalVoteSlot{Hash: b.Hash(), Votes: make([]core.DPosProposalVote, 0)}
 }
 
 func (p *proposalDispatcher) FinishProposal() {
+	fmt.Printf("\n")
+	log.Error("[FinishProposal] start")
+	defer log.Error("[FinishProposal] end\n")
 	proposal, blockHash := p.acceptVotes[0].Proposal.Sponsor, p.processingBlock.Hash()
 
 	log.Info("[p.consensus.IsOnDuty()]", p.consensus.IsOnDuty())
@@ -167,9 +179,9 @@ func (p *proposalDispatcher) CleanProposals() {
 }
 
 func (p *proposalDispatcher) ProcessProposal(d core.DPosProposal) {
-
+	fmt.Printf("\n")
 	log.Info("[ProcessProposal] start")
-	defer log.Info("[ProcessProposal] end")
+	defer log.Info("[ProcessProposal] end\n")
 
 	if !blockchain.IsProposalValid(&d) {
 		log.Warn("Invalid proposal.")
@@ -209,6 +221,7 @@ func (p *proposalDispatcher) ProcessProposal(d core.DPosProposal) {
 	}
 
 	p.acceptProposal(d)
+
 }
 
 func (p *proposalDispatcher) TryAppendAndBroadcastConfirmBlockMsg() bool {
@@ -217,7 +230,11 @@ func (p *proposalDispatcher) TryAppendAndBroadcastConfirmBlockMsg() bool {
 		p.currentVoteSlot.Votes = append(p.currentVoteSlot.Votes, v)
 	}
 
-	log.Info("[TryAppendAndBroadcastConfirmBlockMsg][OnDuty],append confirm.")
+	log.Info("[TryAppendAndBroadcastConfirmBlockMsg] append confirm.")
+	node.LocalNode.Relay(nil, &core.BlockConfirm{
+		ConfirmFlag: true,
+		Confirm:     p.currentVoteSlot,
+	})
 	if err := node.LocalNode.AppendConfirm(p.currentVoteSlot); err != nil {
 		log.Error("[AppendConfirm] err:", err.Error())
 		return false
@@ -240,6 +257,8 @@ func (p *proposalDispatcher) OnBlockAdded(b *core.Block) {
 }
 
 func (p *proposalDispatcher) FinishConsensus() {
+	log.Info("[FinishConsensus] start")
+	defer log.Info("[FinishConsensus] end")
 	log.Info("[FinishConsensus], change states to ConsensusReady")
 	c := log.ConsensusEvent{EndTime: time.Now(), Height: p.CurrentHeight()}
 	p.eventMonitor.OnConsensusFinished(c)
@@ -325,6 +344,8 @@ func (p *proposalDispatcher) countRejectedVote(v core.DPosProposalVote) {
 }
 
 func (p *proposalDispatcher) acceptProposal(d core.DPosProposal) {
+	log.Info("[acceptProposal] start")
+	defer log.Info("[acceptProposal] end")
 	vote := core.DPosProposalVote{Proposal: d, Signer: p.manager.GetPublicKey(), Accept: true}
 	var err error
 	vote.Sign, err = p.account.SignVote(&vote)
@@ -333,6 +354,7 @@ func (p *proposalDispatcher) acceptProposal(d core.DPosProposal) {
 		return
 	}
 	voteMsg := &msg2.VoteMessage{Command: msg2.AcceptVote, Vote: vote}
+
 
 	p.ProcessVote(vote, true)
 	p.network.BroadcastMessage(voteMsg)

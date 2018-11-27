@@ -52,6 +52,7 @@ func (v *view) ChangeView(viewOffset *uint32) {
 
 		v.isDposOnDuty = common.BytesToHexString(currentArbiter) == config.Parameters.ArbiterConfiguration.Name
 		log.Info("current onduty arbiter:", currentArbiter)
+		log.Error("current onduty arbiter:", common.BytesToHexString(currentArbiter))
 
 		v.listener.OnViewChanged(v.isDposOnDuty)
 	}
